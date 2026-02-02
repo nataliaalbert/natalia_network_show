@@ -1,9 +1,8 @@
 import os
 import re
 import pandas as pd
-from PyPDF2 import PdfReader
+import fitz  # PyMuPDF
 from pathlib import Path
-from docling.document_converter import DocumentConverter
 
 # -------------------------------------------------------------------
 # 1. Paths – adjust these if your project name/folders differ
@@ -32,11 +31,13 @@ def load_terms_from_excel(path: str) -> pd.DataFrame:
     return terms_df
 
 def pdf_to_text(path: str) -> str:
-    converter = DocumentConverter()
-    result = converter.convert(path)
+    doc = fitz.open(path)
+    text = ''
 
-    text = result.document.export_to_text()
+    for page in doc:
+        text += page.get_text() + '\n'
 
+    doc.close()
     return text
 
 
