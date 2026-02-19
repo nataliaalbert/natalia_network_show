@@ -30,17 +30,17 @@ natalia_network_show/
 |       `-- sample_C/     <- micro-sample of NZ 7k corpus (baseline runs)
 |
 |-- dictionaries/
-|   |-- dict1_human_built.xlsx     <- Four Pillars, expert built, running now
-|   |-- dict2_llm_generated.xlsx   <- LLM-generated (to build)
-|   |-- dict3_corpus_derived.xlsx  <- Corpus-derived via TF-IDF (to build)
-|   `-- dict4_imbalanced.xlsx      <- Deliberately imbalanced stress test (to build)
+|   |-- dict1_human_built.xlsx    <- Four Pillars, expert built, running now
+|   |-- dict2_llm_generated.xlsx  <- LLM-generated (to build)
+|   |-- dict3_corpus_derived.xlsx <- Corpus-derived via TF-IDF (to build)
+|   `-- dict4_imbalanced.xlsx     <- Deliberately imbalanced stress test (to build)
 |
 |-- data/
-|   |-- processed/     <- term counts + merged feature tables
-|   |-- runs/          <- one subfolder per combination run
-|   |-- ground_truth/  <- manually coded benchmark sample
-|   |-- evaluation/    <- metrics, variable matrix
-|   `-- network/       <- final graph files (future)
+|   |-- processed/    <- term counts + merged feature tables
+|   |-- runs/         <- one subfolder per combination run
+|   |-- ground_truth/ <- manually coded benchmark sample
+|   |-- evaluation/   <- metrics, variable matrix
+|   `-- network/      <- final graph files (future)
 |
 `-- scripts/
     |-- config.py                <- all paths live here, import this first
@@ -69,7 +69,10 @@ Defines every file path in the project as a Python variable. All other scripts i
 Loops through all the metadata CSVs (one per Policy Commons search query), combines them into a single master metadata.csv, and copies all unique PDFs into one corpus/output/ folder. Handles deduplication — if the same PDF appears across multiple searches, it is only copied once.
 
 Input: corpus/raw/metadata-search-*.csv and corpus/raw/search-{id}/artifact-*.pdf
-Output: corpus/output/metadata.csv and corpus/output/artifact-*.pdf (all unique PDFs in one place)
+
+Output: corpus/output/metadata.csv and corpus/output/artifact-*.pdf
+
+---
 
 **02_filter_nz_only.py**
 
@@ -77,11 +80,14 @@ Reads the master metadata, keeps only rows where Org. Country of Publication is 
 
 Warning: This script deletes files. Back up corpus/output/ before running if unsure.
 
+---
+
 **03_fix_discrepancy.py**
 
 Quality check — compares every row in metadata.csv against the actual PDFs on disk. Any metadata row with no corresponding file gets flagged and saved.
 
 Output: corpus/output/missing_files_metadata.csv
+
 Pass condition: missing file list is empty or less than 1% of corpus
 
 ---
@@ -93,6 +99,8 @@ Pass condition: missing file list is empty or less than 1% of corpus
 The main extraction script. Opens each PDF with PyMuPDF (fitz), extracts the full text, then uses regex to count how many times each term from dict1_human_built.xlsx appears. Only records non-zero matches. Case-insensitive.
 
 Output: data/processed/policy_term_counts.csv with columns: document, category, term, count
+
+---
 
 **05_metadata_merge.py**
 
@@ -116,13 +124,13 @@ Run after script 05.
 
 | Step | Script | What it does |
 |------|--------|--------------|
-| 1 | config.py | Folders created, paths ready |
-| 2 | 01_data_integration.py | Master metadata.csv and all PDFs in one place |
-| 3 | 02_filter_nz_only.py | NZ-only corpus |
-| 4 | 03_fix_discrepancy.py | Quality check |
-| 5 | 04_extract_terms.py | Term counts per document |
-| 6 | 05_metadata_merge.py | Enriched feature table |
-| 7 | explore_data.py | See what you have got |
+| A | config.py | Folders created, paths ready |
+| B | 01_data_integration.py | Master metadata.csv and all PDFs in one place |
+| C | 02_filter_nz_only.py | NZ-only corpus |
+| D | 03_fix_discrepancy.py | Quality check |
+| E | 04_extract_terms.py | Term counts per document |
+| F | 05_metadata_merge.py | Enriched feature table |
+| G | explore_data.py | See what you have got |
 
 ---
 
